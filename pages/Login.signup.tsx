@@ -1,9 +1,9 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import React, { ReactInstance, ReactNode, useState } from "react";
-import { useMutation, useQueryClient } from "react-query";
+import { useMutation, UseMutationResult, useQueryClient } from "react-query";
 import Cookies from "universal-cookie";
 import Loading from "../Notfound/Loading";
-import { useForm } from "react-hook-form";
+import { FieldValue, useForm } from "react-hook-form";
 import { FunctionBody, TaggedTemplateExpression } from "typescript";
 const cookies = new Cookies();
 interface formProp {
@@ -27,23 +27,7 @@ const LoginSignup = () => {
   const [name, setName] = useState("");
   const [password, setpassword] = useState("");
 
-  const signup = async ({ userName, password }: formProp) => {
-    console.log(userName, password);
-    const res: AxiosResponse | void = await axios
-      .post("http://localhost:4000/user/signup", {
-        username: userName,
-        name: password,
-      })
-      .catch((error) => {
-        console.log(error.message);
-      });
-    if (!res) return;
-    if (res.data.token !== undefined) {
-      cookies.set("token", res.data.token);
-      console.log(res.data);
-      return res.data;
-    }
-  };
+
   const login = async ({ userName, password }: formProp) => {
 
     const res: AxiosResponse | void = await axios
@@ -62,8 +46,41 @@ const LoginSignup = () => {
       return data;
     }
   };
-  const signup_Mutation  = useMutation(signup);
   const login_Mutation: any = useMutation(login);
+  const signup_Mutation = useMutation({
+    mutationFn:async (data:formProp) =>{const res:any =await axios.post("http://localhost:4000/user/signup",
+     {
+      username: data.userName,
+      name: data.password
+    }
+    )
+    console.log("first")
+    if (res.data.token !== undefined) {
+      cookies.set("token", res.data.token);
+      console.log(res.data);
+      return res.data;
+    }
+  return res
+  }
+  })
+  const signup = async ({ userName, password }: formProp) => {
+    console.log(userName, password);
+    const res: AxiosResponse | void = await axios
+      .post("http://localhost:4000/user/signup", {
+        username: userName,
+        name: password,
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
+    if (!res) return;
+    if (res.data.token !== undefined) {
+      cookies.set("token", res.data.token);
+      console.log(res.data);
+      return res.data;
+    }
+  };
+
   return (
     <>
       <div className="w-full h-screen relative bg-zinc-900/90">
