@@ -1,26 +1,20 @@
-import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
-import React, { ReactInstance, ReactNode, useState } from "react";
-import { useMutation, UseMutationResult, useQueryClient } from "react-query";
+import axios, {  AxiosResponse } from "axios";
+import React, { useState } from "react";
+import { useMutation } from "react-query";
 import Cookies from "universal-cookie";
-import Loading from "../Notfound/Loading";
-import { FieldValue, useForm } from "react-hook-form";
-import { FunctionBody, TaggedTemplateExpression } from "typescript";
+import { useForm } from "react-hook-form";
 const cookies = new Cookies();
 interface formProp {
   userName: string;
   password: string;
 }
-type LoginMutation = {}
-type LoginMutationVariables = {
-  variable: string,
-}
+
 const LoginSignup = () => {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const onSubmit = (data: formProp) => console.log(data.userName);
 
   const [select_form, setselect_form] = useState(true);
   const [username, setUsername] = useState("");
@@ -47,7 +41,7 @@ const LoginSignup = () => {
     }
   };
   const login_Mutation: any = useMutation(login);
-  const signup_Mutation = useMutation({
+  const signup_Mutation:any = useMutation({
     mutationFn:async (data:formProp) =>{const res:any =await axios.post("http://localhost:4000/user/signup",
      {
       username: data.userName,
@@ -60,27 +54,9 @@ const LoginSignup = () => {
       console.log(res.data);
       return res.data;
     }
-  return res
   }
   })
-  const signup = async ({ userName, password }: formProp) => {
-    console.log(userName, password);
-    const res: AxiosResponse | void = await axios
-      .post("http://localhost:4000/user/signup", {
-        username: userName,
-        name: password,
-      })
-      .catch((error) => {
-        console.log(error.message);
-      });
-    if (!res) return;
-    if (res.data.token !== undefined) {
-      cookies.set("token", res.data.token);
-      console.log(res.data);
-      return res.data;
-    }
-  };
-
+ 
   return (
     <>
       <div className="w-full h-screen relative bg-zinc-900/90">
@@ -150,7 +126,7 @@ const LoginSignup = () => {
             </div>
           ) : (
             <div className="absolute max-w-[400px] w-full mx-auto bg-gray-100 text-black rounded-sm p-8">
-              <form onSubmit={handleSubmit(signup_Mutation.mutate)}>
+              <form onSubmit={handleSubmit(signup_Mutation.mutateAsync)}>
                 <h2 className="font-bold text-4xl text-center py-6">Sign up</h2>
                 <div className="flex flex-col my-4">
                   <label>Username</label>
